@@ -1,22 +1,43 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
+import { TrpcController } from './app.controller';
 import { AppService } from './app.service';
+import { Request, Response } from 'express';
+
+
 
 describe('AppController', () => {
-  let appController: AppController;
+  let appController: TrpcController;
+
+
+  let req: Partial<Request>;
+  let res: Partial<Response>;
+  let jsonMock: jest.Mock;
+
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
+      controllers: [TrpcController],
       providers: [AppService],
     }).compile();
 
-    appController = app.get<AppController>(AppController);
+    appController = app.get<TrpcController>(TrpcController);
+
+
+
+    req = {};
+    jsonMock = jest.fn(); // Mocking res.json
+    res = {
+      json: jsonMock,
+    };
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return "Hello from tRPC"', async () => {
+      
+
+      await appController.getMessage(req as Request, res as Response);
+
+      expect(jsonMock).toHaveBeenCalledWith('Hello from tRPC');
     });
   });
 });
